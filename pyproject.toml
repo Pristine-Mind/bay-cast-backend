@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "project-django"
+version = "0.1.0"
+description = ""
+authors = ["Pristine-Minds info@pristine-minds.com>"]
+license = "Apache License 2.0"
+
+[tool.poetry.dependencies]
+Django = "^4.2"
+django-cors-headers = "*"
+django-environ = "*"
+factory-boy = "^3.2.1"
+gunicorn = "^20.1.0"
+psycopg2-binary = "^2.9.9"
+python = "^3.11"
+django-filter = "^2.2.0"
+mock = "^4.0.3"
+celery = "*"
+redis = "*"
+qrcode = "^7.4.2"
+djangorestframework = "*"
+
+[tool.poetry.dev-dependencies]
+django-stubs = { version = "*", allow-prereleases = true }
+ipython = "*"
+pytest-django = "*"
+pytest-icdiff = "*"
+pytest-ordering = "*"
+pytest-profiling = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
