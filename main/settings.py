@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import environ
 import os
+import sys
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'product',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -105,7 +107,7 @@ DATABASES = {
         'USER': env('DJANGO_DB_USER'),
         'PASSWORD': env('DJANGO_DB_PASS'),
         'HOST': env('DJANGO_DB_HOST'),
-        'PORT': env('DJANGO_DB_PORT'),
+        'PORT': '5432',
     }
 }
 
@@ -178,3 +180,22 @@ STATIC_URL = "/staticfiles/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# See if we are inside a test environment
+TESTING = (
+    any(
+        [
+            arg in sys.argv
+            for arg in [
+                "test",
+                "pytest",
+                "py.test",
+                "/usr/local/bin/pytest",
+                "/usr/local/bin/py.test",
+                "/usr/local/lib/python3.6/dist-packages/py/test.py",
+            ]
+            # Provided by pytest-xdist (If pytest is used)
+        ]
+    )
+    or env("PYTEST_XDIST_WORKER") is not None
+)

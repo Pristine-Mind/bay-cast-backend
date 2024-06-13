@@ -23,6 +23,10 @@ from django.conf import settings
 from rest_framework import routers
 
 from product import views as product_views
+from user.views import (
+    RegistrationView,
+    LoginView
+)
 
 router = routers.DefaultRouter()
 
@@ -32,6 +36,8 @@ router.register(r'process', product_views.ProcessViewSet, basename='process')
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r"^api/v1/", include(router.urls)),
+    url(r"^register", RegistrationView.as_view()),
+    url(r"^login", LoginView.as_view()),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
