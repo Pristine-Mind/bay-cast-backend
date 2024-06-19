@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import User
+from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 from user.models import Profile
 
@@ -36,7 +37,6 @@ class RegistrationSerializer(serializers.Serializer):
 
         # profile
         user_type = self.validated_data['user_type']
-        print(user_type)
 
         # Create the User object
         try:
@@ -59,3 +59,36 @@ class RegistrationSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=255)
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ('user',)
+
+
+class UserSerializer(WritableNestedModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "profile"
+        )
+
+    def create(self, _):
+        raise serializers.ValidationError("Create is not allowed")
+
+    def update(self, instance, validated_data):
+        if "profile" in validated_data:
+            profile_data = validated_data.pop("profile")
+            print(instance, "dd")
+            profile = Profile.objects.get(user_id=instance.id)
+            profile.user_type = profile_data.get("user_type", profile.user_type)
+            profile.save()
+        return super().update(instance, validated_data)

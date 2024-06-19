@@ -25,11 +25,13 @@ from rest_framework import routers
 from product import views as product_views
 from user.views import (
     RegistrationView,
-    LoginView
+    LoginView,
+    UserViewSet,
 )
 
 router = routers.DefaultRouter()
 
+router.register(r'user', UserViewSet, basename='user')
 router.register(r'product', product_views.ProductViewSet, basename='product')
 router.register(r'process', product_views.ProcessViewSet, basename='process')
 

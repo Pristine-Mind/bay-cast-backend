@@ -1,16 +1,20 @@
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
 from django.utils import timezone
+from django.contrib.auth.models import User
+
 from datetime import timedelta
 
 from rest_framework import (
     views,
     response,
-    status
+    status,
+    viewsets,
+    permissions,
 )
 from rest_framework.authtoken.models import Token
 
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, UserSerializer
 
 
 def bad_request(message):
@@ -61,3 +65,13 @@ class LoginView(views.APIView):
             )
         else:
             return bad_request("Invalid username or password")
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        if self.request.user and self.request.user.is_superuser:
+            return User.objects.all()
+        return User.objects.none()

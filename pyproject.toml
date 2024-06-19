@@ -19,6 +19,7 @@ celery = "*"
 redis = "*"
 qrcode = "^7.4.2"
 djangorestframework = "*"
+drf-writable-nested = "*"
 
 [tool.poetry.dev-dependencies]
 django-stubs = { version = "*", allow-prereleases = true }
