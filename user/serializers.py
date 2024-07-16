@@ -24,6 +24,7 @@ class RegistrationSerializer(serializers.Serializer):
         return username
 
     def validate_password(self, password):
+        print(password)
         validate_password(password)
         return password
 
@@ -48,6 +49,7 @@ class RegistrationSerializer(serializers.Serializer):
                 password=password,
                 is_active=True
             )
+            print(user, "uu")
         except Exception:
             raise serializers.ValidationError('Could not create user.')
         try:
@@ -59,3 +61,22 @@ class RegistrationSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=255)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(
+        source='profile.get_user_type_display',
+        read_only=True
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'username',
+            'role',
+            'first_name',
+            'last_name',
+            'email',
+        )
+

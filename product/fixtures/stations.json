@@ -1,0 +1,44 @@
+[
+    {
+      "model": "product.station",
+      "pk": 1,
+      "fields": {
+        "name": "Station 1"
+      }
+    },
+    {
+      "model": "product.station",
+      "pk": 2,
+      "fields": {
+        "name": "Station 2"
+      }
+    },
+    {
+      "model": "product.station",
+      "pk": 3,
+      "fields": {
+        "name": "Station 3"
+      }
+    },
+    {
+      "model": "product.station",
+      "pk": 4,
+      "fields": {
+        "name": "Station 4"
+      }
+    },
+    {
+      "model": "product.station",
+      "pk": 5,
+      "fields": {
+        "name": "Station 5"
+      }
+    },
+    {
+      "model": "product.station",
+      "pk": 6,
+      "fields": {
+        "name": "Station 6"
+      }
+    }
+]

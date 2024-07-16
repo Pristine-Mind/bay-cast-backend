@@ -1,13 +1,23 @@
 from django.contrib import admin
 
-from product.models import Process, Product
+from product.models import Process, Product, Station
 
 
-@admin.register(Process)
-class ProcessAdmin(admin.ModelAdmin):
-    pass
+class ProcessAdminInline(admin.TabularInline):
+    model = Process
+    fields = (
+        'id',
+        'product',
+        'entry_time',
+        'exit_time',
+    )
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Station)
+class StationAdmin(admin.ModelAdmin):
+    inlines = [ProcessAdminInline]

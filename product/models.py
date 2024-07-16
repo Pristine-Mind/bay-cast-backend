@@ -11,6 +11,15 @@ class Product(models.Model):
         return f"ID: {self.product_id}, Name: {self.product_name}"
 
 
+class Station(models.Model):
+    name = models.CharField(
+        verbose_name=_('Name of station')
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class Process(models.Model):
     """
     Model to track the processes of a manufacturing system.
@@ -43,14 +52,17 @@ class Process(models.Model):
         SHAKEOUT = 'shakeout', _('Shakeout')
         CLEANING = 'cleaning', _('Cleaning')
 
+    station = models.ForeignKey(Station, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     process_number = models.IntegerField(default=1)
-    stage = models.CharField(max_length=20, choices=ProcessStep.choices)
+    stage = models.CharField(max_length=20, choices=ProcessStep.choices, null=True, blank=True)
     entry_time = models.DateTimeField(
-        verbose_name=_('Time of product entry in process')
+        verbose_name=_('Time of product entry in process'),
+        null=True, blank=True,
     )
     exit_time = models.DateTimeField(
-        verbose_name=_('Time of product exit from process')
+        verbose_name=_('Time of product exit from process'),
+        null=True, blank=True,
     )
     temperature = models.DecimalField(
         max_digits=5,

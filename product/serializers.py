@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
-from .models import Product, Process
+from django.db import models
+from django.utils import timezone
+
+from .models import Product, Process, Station
 from .utils import generate_qr
 
 
@@ -38,7 +41,15 @@ class ProductSerializer(serializers.ModelSerializer):
         product_id = validated_data.get('product_id')
         product_name = validated_data.get('product_name')
         validated_data['qr_image'] = generate_qr(product_id, product_name)
-        return super().create(validated_data)
+        product = super().create(validated_data)
+
+        # create corresponding process as well
+        Process.objects.create(
+            product=product,
+            station_id=1,
+            entry_time=timezone.now()
+        )
+        return product
 
 
 class ProcessSerializer(serializers.ModelSerializer):
@@ -55,3 +66,30 @@ class ProcessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Process
         fields = "__all__"
+
+
+class StationSerialzier(serializers.ModelSerializer):
+    number_of_products = serializers.SerializerMethodField()
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Station
+        fields = '__all__'
+
+    def get_number_of_products(self, obj):
+        return Product.objects.filter(
+            process__station=obj
+        ).count()
+
+    def get_products(self, obj):
+        queryset = Process.objects.filter(station=obj).select_related('product')
+
+        return [
+            {
+                "id": process.product.product_id,
+                "product_name": process.product.product_name,
+                "entry_time": process.entry_time,
+                "exit_time": process.exit_time,
+                "qr_image": self.context.get('request').build_absolute_uri(process.product.qr_image.url),
+            } for process in queryset
+        ]
