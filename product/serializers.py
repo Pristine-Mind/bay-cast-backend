@@ -93,3 +93,15 @@ class StationSerialzier(serializers.ModelSerializer):
                 "qr_image": self.context.get('request').build_absolute_uri(process.product.qr_image.url),
             } for process in queryset
         ]
+
+
+class ProductProcessSerializer(serializers.Serializer):
+    product_id = serializers.CharField()
+    product_name = serializers.CharField()
+    entry_time = serializers.DateTimeField()
+    exit_time = serializers.DateTimeField()
+
+
+class StationProductProcessSerializer(serializers.Serializer):
+    station_name = serializers.CharField()
+    products = ProductProcessSerializer(many=True)

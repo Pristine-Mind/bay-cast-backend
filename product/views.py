@@ -1,9 +1,17 @@
+from django.db.models import F
+from collections import defaultdict
 from django.utils import timezone
 from rest_framework import viewsets, response, status
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 from .models import Product, Process, Station
-from .serializers import ProductSerializer, ProcessSerializer, StationSerialzier
+from .serializers import (
+    ProductSerializer,
+    ProcessSerializer,
+    StationSerialzier,
+    StationProductProcessSerializer
+)
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -43,3 +51,39 @@ class ProcessViewSet(viewsets.ModelViewSet):
 class StationViewSet(viewsets.ModelViewSet):
     queryset = Station.objects.all()
     serializer_class = StationSerialzier
+
+
+class StationProductProcessView(APIView):
+
+    def get(self, request):
+        data = Process.objects.select_related('product', 'station').values(
+            'station__name',
+            'product__product_id',
+            'product__product_name',
+            'entry_time',
+            'exit_time'
+        ).order_by('station_id')
+
+        # Grouping the data by station
+        grouped_data = defaultdict(list)
+        for item in data:
+            station_name = item['station__name']
+            product_info = {
+                'product_id': item['product__product_id'],
+                'product_name': item['product__product_name'],
+                'entry_time': item['entry_time'],
+                'exit_time': item['exit_time']
+            }
+            grouped_data[station_name].append(product_info)
+
+        # Prepare the data for serialization
+        response_data = [
+            {
+                'station_name': station,
+                'products': products
+            }
+            for station, products in grouped_data.items()
+        ]
+
+        serializer = StationProductProcessSerializer(response_data, many=True)
+        return response.Response(serializer.data)

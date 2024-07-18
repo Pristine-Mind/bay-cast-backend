@@ -41,6 +41,7 @@ urlpatterns = [
     url(r"^api/v1/", include(router.urls)),
     url(r"^register", RegistrationView.as_view()),
     url(r"^login", LoginView.as_view()),
+    path('station-product-process/', product_views.StationProductProcessView.as_view(), name='station-product-process')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
