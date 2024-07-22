@@ -14,6 +14,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.fields import clean_ipv6_address
 
 from .serializers import RegistrationSerializer, UserSerializer
+from .filterset import UserFilter
 
 
 def bad_request(message):
@@ -69,4 +70,4 @@ class LoginView(views.APIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
+    filterset_class = UserFilter
