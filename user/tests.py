@@ -24,7 +24,6 @@ class RegistrationTest(APITestCase):
         # update the email now should create user
         data["email"] = "test@gmail.com"
         resp = self.client.post("/register", data=data)
-        print(resp.content)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(User.objects.filter(is_active=True).count(), old_user_count + 1)
 

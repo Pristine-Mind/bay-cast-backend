@@ -11,7 +11,8 @@ from rest_framework import (
     viewsets,
 )
 from rest_framework.authtoken.models import Token
-from rest_framework.fields import clean_ipv6_address
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 from .serializers import RegistrationSerializer, UserSerializer
 from .filterset import UserFilter
@@ -71,3 +72,12 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
+    permission_classes = [IsAuthenticated]
+
+    @action(
+        detail=False,
+        url_path="me",
+        serializer_class=UserSerializer,
+    )
+    def get_authenticated_user_info(self, request, *args, **kwargs):
+        return response.Response(self.get_serializer_class()(request.user).data)

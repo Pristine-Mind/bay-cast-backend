@@ -24,7 +24,6 @@ class RegistrationSerializer(serializers.Serializer):
         return username
 
     def validate_password(self, password):
-        print(password)
         validate_password(password)
         return password
 
@@ -37,7 +36,6 @@ class RegistrationSerializer(serializers.Serializer):
 
         # profile
         user_type = self.validated_data['user_type']
-        print(user_type)
 
         # Create the User object
         try:
@@ -49,7 +47,6 @@ class RegistrationSerializer(serializers.Serializer):
                 password=password,
                 is_active=True
             )
-            print(user, "uu")
         except Exception:
             raise serializers.ValidationError('Could not create user.')
         try:
