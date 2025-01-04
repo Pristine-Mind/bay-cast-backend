@@ -43,8 +43,9 @@ env = environ.Env(
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 ALLOWED_HOSTS = [
-    'localhost',
+    '54.166.188.75',
     '0.0.0.0',
+    'localhost',
     *env('DJANGO_ADDITIONAL_ALLOWED_HOSTS'),
 ]
 SECRET_KEY = env('DJANGO_SECRET_KEY')
@@ -117,7 +118,8 @@ DATABASES = {
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
+    'https://354.166.188.75:3000',
+    'https://54.166.188.75',
 )
 
 

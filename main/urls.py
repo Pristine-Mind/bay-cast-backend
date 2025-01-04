@@ -35,13 +35,14 @@ router.register(r'product', product_views.ProductViewSet, basename='product')
 router.register(r'process', product_views.ProcessViewSet, basename='process')
 router.register(r'stations', product_views.StationViewSet, basename='station')
 router.register(r'users', UserViewSet, basename='users')
+router.register(r'casting-snapshots', product_views.CastingSnapshotViewSet, basename='casting-snapshot')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r"^api/v1/", include(router.urls)),
     url(r"^register", RegistrationView.as_view()),
-    url(r"^login", LoginView.as_view()),
-    path('station-product-process/', product_views.StationProductProcessView.as_view(), name='station-product-process')
+    url(r"^api/login", LoginView.as_view()),
+    path('api/station-product-process/', product_views.StationProductProcessView.as_view(), name='station-product-process')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

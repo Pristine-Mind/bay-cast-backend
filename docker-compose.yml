@@ -1,20 +1,15 @@
 version: '3.5'
 
 x-server: &base_server_setup
-  image: project:latest
+  image: bay-cast-backend:latest
   build: .
-  # To attach to container with stdin `docker attach <container_name>`
-  # Used for python debugging.
   stdin_open: true
   tty: true
   environment:
-    # Overwrite this using .env (for additional configuration, look at main/settings.py:env
-    # Database (from db.environment)
     DJANGO_DB_HOST: ${DJANGO_DB_HOST:-db}
     DJANGO_DB_NAME: ${DJANGO_DB_NAME:-postgres}
     DJANGO_DB_USER: ${DJANGO_DB_USER:-postgres}
     DJANGO_DB_PASS: ${DJANGO_DB_PASS:-postgres}
-    # Other development defaults configs
     DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
   env_file:
     - .env
@@ -22,7 +17,6 @@ x-server: &base_server_setup
     - .:/code
   depends_on:
     - db
-    - redis
 
 
 services:
@@ -37,11 +31,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  redis:
-    image: redis:latest
     volumes:
-      - redis-data:/data
+      - postgres_data:/var/lib/postgresql/data/
 
   web:
     <<: *base_server_setup
@@ -50,4 +41,4 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
 
 volumes:
-  redis-data:
+  postgres_data:

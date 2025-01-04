@@ -1,16 +1,17 @@
 from django.db.models import F
 from collections import defaultdict
 from django.utils import timezone
-from rest_framework import viewsets, response, status
+from rest_framework import viewsets, response, status, permissions
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 
-from .models import Product, Process, Station
+from .models import Product, Process, Station, CastingSnapshot
 from .serializers import (
     ProductSerializer,
     ProcessSerializer,
     StationSerialzier,
-    StationProductProcessSerializer
+    StationProductProcessSerializer,
+    CastingSnapshotSerializer
 )
 
 
@@ -87,3 +88,43 @@ class StationProductProcessView(APIView):
 
         serializer = StationProductProcessSerializer(response_data, many=True)
         return response.Response(serializer.data)
+
+
+class CastingSnapshotViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing Casting Snapshots.
+    """
+    queryset = CastingSnapshot.objects.all()
+    serializer_class = CastingSnapshotSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        """
+        Overridden to handle nested creation for RammingFloor and MoldingFloor.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        """
+        Overridden to handle nested updates for RammingFloor and MoldingFloor.
+        """
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return response.Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Handles deletion of CastingSnapshot and its related entities.
+        """
+        instance = self.get_object()
+        instance.ramming_floor.delete()
+        instance.molding_floor.delete()
+        self.perform_destroy(instance)
+        return response.Response(status=status.HTTP_204_NO_CONTENT)

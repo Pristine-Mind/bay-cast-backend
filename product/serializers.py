@@ -1,9 +1,8 @@
 from rest_framework import serializers
 
-from django.db import models
 from django.utils import timezone
 
-from .models import Product, Process, Station
+from .models import Product, Process, Station, CastingSnapshot, RammingFloor, MoldingFloor, ProcessingImages
 from .utils import generate_qr
 
 
@@ -105,3 +104,70 @@ class ProductProcessSerializer(serializers.Serializer):
 class StationProductProcessSerializer(serializers.Serializer):
     station_name = serializers.CharField()
     products = ProductProcessSerializer(many=True)
+
+
+class RammingFloorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RammingFloor
+        fields = '__all__'
+
+
+class MoldingFloorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoldingFloor
+        fields = '__all__'
+
+
+class ProcessingImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessingImages
+        fields = ['id', 'image', 'description']
+
+
+class CastingSnapshotSerializer(serializers.ModelSerializer):
+    ramming_floor = RammingFloorSerializer()
+    molding_floor = MoldingFloorSerializer()
+    pictures = ProcessingImagesSerializer(many=True, read_only=True)
+    pictures_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, queryset=ProcessingImages.objects.all(), source='pictures'
+    )
+
+    class Meta:
+        model = CastingSnapshot
+        fields = [
+            'id', 'process', 'control_no', 'casting_type', 'weight_lbs', 'materials', 'pattern_type',
+            'sand_ph_load', 'sand_temperature',
+            'ramming_floor', 'molding_floor',
+            'mold_close_to_pour_time_days', 'pour_temperature', 'pour_time_seconds',
+            'shakeout_time_days', 'surface_quality_grade', 'comments', 'pictures', 'pictures_ids'
+        ]
+
+    def create(self, validated_data):
+        ramming_floor_data = validated_data.pop('ramming_floor')
+        molding_floor_data = validated_data.pop('molding_floor')
+        ramming_floor = RammingFloor.objects.create(**ramming_floor_data)
+        molding_floor = MoldingFloor.objects.create(**molding_floor_data)
+        casting_snapshot = CastingSnapshot.objects.create(
+            ramming_floor=ramming_floor, molding_floor=molding_floor, **validated_data
+        )
+        return casting_snapshot
+
+    def update(self, instance, validated_data):
+        ramming_floor_data = validated_data.pop('ramming_floor', None)
+        molding_floor_data = validated_data.pop('molding_floor', None)
+
+        if ramming_floor_data:
+            for attr, value in ramming_floor_data.items():
+                setattr(instance.ramming_floor, attr, value)
+            instance.ramming_floor.save()
+
+        if molding_floor_data:
+            for attr, value in molding_floor_data.items():
+                setattr(instance.molding_floor, attr, value)
+            instance.molding_floor.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
