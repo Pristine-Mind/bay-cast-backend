@@ -94,37 +94,47 @@ class CastingSnapshotViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing Casting Snapshots.
     """
-    queryset = CastingSnapshot.objects.all()
+    queryset = CastingSnapshot.objects.select_related(
+        'product',
+        'station',
+        'station_one',
+        'ramming_floor',
+        'molding_floor',
+        'pour',
+        'shakeout',
+        'quality',
+
+    )
     serializer_class = CastingSnapshotSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        """
-        Overridden to handle nested creation for RammingFloor and MoldingFloor.
-        """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+#     def create(self, request, *args, **kwargs):
+#         """
+#         Overridden to handle nested creation for RammingFloor and MoldingFloor.
+#         """
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
+#         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
-        """
-        Overridden to handle nested updates for RammingFloor and MoldingFloor.
-        """
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+#     def update(self, request, *args, **kwargs):
+#         """
+#         Overridden to handle nested updates for RammingFloor and MoldingFloor.
+#         """
+#         partial = kwargs.pop('partial', False)
+#         instance = self.get_object()
+#         serializer = self.get_serializer(instance, data=request.data, partial=partial)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_update(serializer)
 
-        return response.Response(serializer.data)
+#         return response.Response(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
-        """
-        Handles deletion of CastingSnapshot and its related entities.
-        """
-        instance = self.get_object()
-        instance.ramming_floor.delete()
-        instance.molding_floor.delete()
-        self.perform_destroy(instance)
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+#     def destroy(self, request, *args, **kwargs):
+#         """
+#         Handles deletion of CastingSnapshot and its related entities.
+#         """
+#         instance = self.get_object()
+#         instance.ramming_floor.delete()
+#         instance.molding_floor.delete()
+#         self.perform_destroy(instance)
+#         return response.Response(status=status.HTTP_204_NO_CONTENT)

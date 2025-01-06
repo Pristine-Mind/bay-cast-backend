@@ -2,7 +2,19 @@ from rest_framework import serializers
 
 from django.utils import timezone
 
-from .models import Product, Process, Station, CastingSnapshot, RammingFloor, MoldingFloor, ProcessingImages
+from .models import (
+    Product,
+    Process,
+    Station,
+    ProcessingImages,
+    MoldingFloor,
+    StationOne,
+    Pour,
+    Shakeout,
+    Quality,
+    CastingSnapshot,
+    RammingFloor,
+)
 from .utils import generate_qr
 
 
@@ -106,68 +118,225 @@ class StationProductProcessSerializer(serializers.Serializer):
     products = ProductProcessSerializer(many=True)
 
 
-class RammingFloorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = RammingFloor
-        fields = '__all__'
-
-
 class MoldingFloorSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoldingFloor
         fields = '__all__'
 
 
-class ProcessingImagesSerializer(serializers.ModelSerializer):
+class StationOneSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProcessingImages
-        fields = ['id', 'image', 'description']
+        model = StationOne
+        fields = '__all__'
+
+
+class PourSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pour
+        fields = '__all__'
+
+
+class ShakeoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shakeout
+        fields = '__all__'
+
+
+class QualitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quality
+        fields = '__all__'
+
+
+class RammingFloorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RammingFloor
+        fields = '__all__'
 
 
 class CastingSnapshotSerializer(serializers.ModelSerializer):
-    ramming_floor = RammingFloorSerializer()
-    molding_floor = MoldingFloorSerializer()
-    pictures = ProcessingImagesSerializer(many=True, read_only=True)
-    pictures_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=ProcessingImages.objects.all(), source='pictures'
-    )
+    """
+    Serializer for the CastingSnapshot model, with nested station-specific serializers.
+    """
+    station_one = StationOneSerializer(required=False, allow_null=True)
+    ramming_floor = RammingFloorSerializer(required=False, allow_null=True)
+    molding_floor = MoldingFloorSerializer(required=False, allow_null=True)
+    pour = PourSerializer(required=False, allow_null=True)
+    shakeout = ShakeoutSerializer(required=False, allow_null=True)
+    quality = QualitySerializer(required=False, allow_null=True)
 
     class Meta:
         model = CastingSnapshot
         fields = [
-            'id', 'process', 'control_no', 'casting_type', 'weight_lbs', 'materials', 'pattern_type',
-            'sand_ph_load', 'sand_temperature',
-            'ramming_floor', 'molding_floor',
-            'mold_close_to_pour_time_days', 'pour_temperature', 'pour_time_seconds',
-            'shakeout_time_days', 'surface_quality_grade', 'comments', 'pictures', 'pictures_ids'
+            'id',
+            'product',
+            'station',
+            'station_one',
+            'ramming_floor',
+            'molding_floor',
+            'pour',
+            'shakeout',
+            'quality',
         ]
 
+    def has_significant_value(self, data):
+        """
+        Returns True if at least one field in the data dict
+        is non-empty, non-None, or otherwise 'significant'.
+        You can customize this check based on your business rules.
+        """
+        if not data:
+            return False
+
+        for value in data.values():
+            # 1. If value is None, ignore
+            if value is None:
+                continue
+
+            # 2. If it's a string, see if it's empty or just whitespace
+            if isinstance(value, str) and value.strip() == '':
+                continue
+
+            # 3. If you also consider zero to be "insignificant," check that here:
+            # if isinstance(value, (int, float)) and value == 0:
+            #    continue
+
+            return True
+
+        return False
+
     def create(self, validated_data):
-        ramming_floor_data = validated_data.pop('ramming_floor')
-        molding_floor_data = validated_data.pop('molding_floor')
-        ramming_floor = RammingFloor.objects.create(**ramming_floor_data)
-        molding_floor = MoldingFloor.objects.create(**molding_floor_data)
-        casting_snapshot = CastingSnapshot.objects.create(
-            ramming_floor=ramming_floor, molding_floor=molding_floor, **validated_data
-        )
-        return casting_snapshot
+        """
+        Custom create method to handle nested writes for station-specific data.
+        """
+        station_one_data = validated_data.pop('station_one', None)
+        molding_floor_data = validated_data.pop('molding_floor', None)
+        pour_data = validated_data.pop('pour', None)
+        shakeout_data = validated_data.pop('shakeout', None)
+        quality_data = validated_data.pop('quality', None)
+        ramming_floor_data = validated_data.pop('ramming_floor', None)
+
+        # Create the CastingSnapshot first
+        snapshot = CastingSnapshot.objects.create(**validated_data)
+
+        # If station_one data was provided, create a StationOne record and link it
+        if self.has_significant_value(station_one_data):
+            station_one_obj = StationOne.objects.create(**station_one_data)
+            snapshot.station_one = station_one_obj
+            snapshot.save()
+
+        # If molding_floor data was provided, create a MoldingFloor record and link it
+        if self.has_significant_value(molding_floor_data):
+            molding_floor_obj = MoldingFloor.objects.create(**molding_floor_data)
+            snapshot.molding_floor = molding_floor_obj
+            snapshot.save()
+
+        if self.has_significant_value(ramming_floor_data):
+            ramming_floor_obj = RammingFloor.objects.create(**ramming_floor_data)
+            snapshot.ramming_floor = ramming_floor_obj
+            snapshot.save()
+
+        # If pour data was provided
+        if self.has_significant_value(pour_data):
+            pour_obj = Pour.objects.create(**pour_data)
+            snapshot.pour = pour_obj
+            snapshot.save()
+
+        # If shakeout data was provided
+        if self.has_significant_value(shakeout_data):
+            shakeout_obj = Shakeout.objects.create(**shakeout_data)
+            snapshot.shakeout = shakeout_obj
+            snapshot.save()
+
+        # If quality data was provided
+        if self.has_significant_value(quality_data):
+            quality_obj = Quality.objects.create(**quality_data)
+            snapshot.quality = quality_obj
+            snapshot.save()
+
+        return snapshot
 
     def update(self, instance, validated_data):
-        ramming_floor_data = validated_data.pop('ramming_floor', None)
+        """
+        Custom update method for nested writes.
+        """
+        station_one_data = validated_data.pop('station_one', None)
         molding_floor_data = validated_data.pop('molding_floor', None)
+        pour_data = validated_data.pop('pour', None)
+        shakeout_data = validated_data.pop('shakeout', None)
+        quality_data = validated_data.pop('quality', None)
+        ramming_floor_data = validated_data.pop('ramming_floor', None)
 
-        if ramming_floor_data:
-            for attr, value in ramming_floor_data.items():
-                setattr(instance.ramming_floor, attr, value)
-            instance.ramming_floor.save()
-
-        if molding_floor_data:
-            for attr, value in molding_floor_data.items():
-                setattr(instance.molding_floor, attr, value)
-            instance.molding_floor.save()
-
+        # Update the CastingSnapshot's own fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+
+        # Update or create StationOne
+        if station_one_data is not None:
+            if instance.station_one:
+                # Update existing StationOne
+                for attr, value in station_one_data.items():
+                    setattr(instance.station_one, attr, value)
+                instance.station_one.save()
+            else:
+                station_one_obj = StationOne.objects.create(**station_one_data)
+                instance.station_one = station_one_obj
+                instance.save()
+
+        # Update or create MoldingFloor
+        if molding_floor_data is not None:
+            if instance.molding_floor:
+                for attr, value in molding_floor_data.items():
+                    setattr(instance.molding_floor, attr, value)
+                instance.molding_floor.save()
+            else:
+                molding_floor_obj = MoldingFloor.objects.create(**molding_floor_data)
+                instance.molding_floor = molding_floor_obj
+                instance.save()
+        
+        # Update or create MoldingFloor
+        if ramming_floor_data is not None:
+            if instance.ramming_floor:
+                for attr, value in ramming_floor_data.items():
+                    setattr(instance.ramming_floor, attr, value)
+                instance.ramming_floor.save()
+            else:
+                ramming_floor_obj = RammingFloor.objects.create(**ramming_floor_data)
+                instance.ramming_floor = ramming_floor_obj
+                instance.save()
+
+        # Update or create Pour
+        if pour_data is not None:
+            if instance.pour:
+                for attr, value in pour_data.items():
+                    setattr(instance.pour, attr, value)
+                instance.pour.save()
+            else:
+                pour_obj = Pour.objects.create(**pour_data)
+                instance.pour = pour_obj
+                instance.save()
+
+        # Update or create Shakeout
+        if shakeout_data is not None:
+            if instance.shakeout:
+                for attr, value in shakeout_data.items():
+                    setattr(instance.shakeout, attr, value)
+                instance.shakeout.save()
+            else:
+                shakeout_obj = Shakeout.objects.create(**shakeout_data)
+                instance.shakeout = shakeout_obj
+                instance.save()
+
+        # Update or create Quality
+        if quality_data is not None:
+            if instance.quality:
+                for attr, value in quality_data.items():
+                    setattr(instance.quality, attr, value)
+                instance.quality.save()
+            else:
+                quality_obj = Quality.objects.create(**quality_data)
+                instance.quality = quality_obj
+                instance.save()
 
         return instance
