@@ -93,7 +93,7 @@ class StationSerialzier(serializers.ModelSerializer):
         ).count()
 
     def get_products(self, obj):
-        queryset = Process.objects.filter(station=obj).select_related('product')
+        queryset = Process.objects.filter(station=obj, is_active=True).select_related('product')
 
         return [
             {

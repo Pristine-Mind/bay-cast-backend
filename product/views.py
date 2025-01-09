@@ -29,6 +29,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         if is_checked:
             process = Process.objects.filter(product=product).first()
             process.exit_time = timezone.now()
+            process.is_active = False
             process.save()
 
             # create new process objects after the project is moved

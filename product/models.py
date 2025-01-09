@@ -32,6 +32,7 @@ class Process(models.Model):
 
     station = models.ForeignKey(Station, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
     process_number = models.IntegerField(default=1)
     entry_time = models.DateTimeField(
         verbose_name=_("Time of product entry in process"),
