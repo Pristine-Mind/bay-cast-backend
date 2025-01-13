@@ -58,7 +58,7 @@ class StationViewSet(viewsets.ModelViewSet):
 class StationProductProcessView(APIView):
 
     def get(self, request):
-        data = Process.objects.select_related('product', 'station').values(
+        data = Process.objects.select_related('product', 'station').filter(exit_time__isnull=True).values(
             'station__name',
             'product__product_id',
             'product__product_name',
