@@ -69,7 +69,7 @@ class LoginView(views.APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_superuser=False)
     serializer_class = UserSerializer
     filterset_class = UserFilter
     permission_classes = [IsAuthenticated]
