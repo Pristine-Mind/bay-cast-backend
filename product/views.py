@@ -27,11 +27,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         is_checked = request.data.get('is_checked')
         move_to = request.data.get('move_to')
         if is_checked:
-            process = Process.objects.filter(product=product).first()
+            process = Process.objects.filter(product=product).last()
             process.exit_time = timezone.now()
             process.is_active = False
-            process.save()
-
+            process.save(update_fields=['exit_time', 'is_active'])
+            print(process.exit_time, "exit_time")
             # create new process objects after the project is moved
             if not Process.objects.filter(product=product, station=move_to).exists():
                 Process.objects.create(
