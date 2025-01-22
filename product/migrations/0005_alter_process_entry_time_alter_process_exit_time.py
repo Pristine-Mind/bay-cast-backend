@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0004_alter_process_stage'),
+        ("product", "0004_alter_process_stage"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='process',
-            name='entry_time',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Time of product entry in process'),
+            model_name="process",
+            name="entry_time",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Time of product entry in process"
+            ),
         ),
         migrations.AlterField(
-            model_name='process',
-            name='exit_time',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Time of product exit from process'),
+            model_name="process",
+            name="exit_time",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Time of product exit from process"
+            ),
         ),
     ]

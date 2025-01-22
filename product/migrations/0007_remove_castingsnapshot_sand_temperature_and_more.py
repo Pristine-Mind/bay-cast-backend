@@ -6,27 +6,42 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0006_moldingfloor_rammingfloor_remove_process_baume_and_more'),
+        ("product", "0006_moldingfloor_rammingfloor_remove_process_baume_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='castingsnapshot',
-            name='sand_temperature',
+            model_name="castingsnapshot",
+            name="sand_temperature",
         ),
         migrations.AddField(
-            model_name='castingsnapshot',
-            name='sand_temperature_cope',
-            field=models.FloatField(blank=True, help_text='Temperature of the sand used cope.', null=True, verbose_name='Sand Temperature Cope(°F)'),
+            model_name="castingsnapshot",
+            name="sand_temperature_cope",
+            field=models.FloatField(
+                blank=True,
+                help_text="Temperature of the sand used cope.",
+                null=True,
+                verbose_name="Sand Temperature Cope(°F)",
+            ),
         ),
         migrations.AddField(
-            model_name='castingsnapshot',
-            name='sand_temperature_core',
-            field=models.FloatField(blank=True, help_text='Temperature of the sand used core.', null=True, verbose_name='Sand Temperature Core(°F)'),
+            model_name="castingsnapshot",
+            name="sand_temperature_core",
+            field=models.FloatField(
+                blank=True,
+                help_text="Temperature of the sand used core.",
+                null=True,
+                verbose_name="Sand Temperature Core(°F)",
+            ),
         ),
         migrations.AddField(
-            model_name='castingsnapshot',
-            name='sand_temperature_drag',
-            field=models.FloatField(blank=True, help_text='Temperature of the sand used drag.', null=True, verbose_name='Sand Temperature Drag(°F)'),
+            model_name="castingsnapshot",
+            name="sand_temperature_drag",
+            field=models.FloatField(
+                blank=True,
+                help_text="Temperature of the sand used drag.",
+                null=True,
+                verbose_name="Sand Temperature Drag(°F)",
+            ),
         ),
     ]

@@ -11,7 +11,7 @@ from .serializers import (
     ProcessSerializer,
     StationSerialzier,
     StationProductProcessSerializer,
-    CastingSnapshotSerializer
+    CastingSnapshotSerializer,
 )
 
 
@@ -19,30 +19,37 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-    @action(
-        detail=True, methods=['post']
-    )
+    @action(detail=True, methods=["post"])
     def update_product(self, request, pk=None):
         product = self.get_object()
-        is_checked = request.data.get('is_checked')
-        move_to = request.data.get('move_to')
-        if is_checked:
-            process = Process.objects.filter(product=product).last()
-            process.exit_time = timezone.now()
-            process.is_active = False
-            process.save(update_fields=['exit_time', 'is_active'])
-            print(process.exit_time, "exit_time")
-            # create new process objects after the project is moved
-            if not Process.objects.filter(product=product, station=move_to).exists():
-                Process.objects.create(
-                    product=product,
-                    station_id=move_to,
-                    entry_time=timezone.now()
-                )
+        is_checked = request.data.get("is_checked")
+        move_to = request.data.get("move_to")
+
+        # Retrieve the most recent process for the product to determine its current station
+        current_process = Process.objects.filter(product=product).last()
+
+        # Check if the target station is the same as the current station
+        if str(current_process.station_id) == str(move_to):
             return response.Response(
-                {'is_checked': 'Updated'}
+                {"detail": "Product is already in the specified station."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        return response.response("Couldn't update", status=status.HTTP_400_BAD_REQUEST)
+
+        if is_checked:
+            # Mark the current process as exited
+            current_process.exit_time = timezone.now()
+            current_process.is_active = False
+            current_process.save(update_fields=["exit_time", "is_active"])
+
+            # Create a new process for the move
+            Process.objects.create(
+                product=product, station_id=move_to, entry_time=timezone.now()
+            )
+            return response.Response(
+                {"is_checked": "Updated"}, status=status.HTTP_200_OK
+            )
+
+        return response.Response("Couldn't update", status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProcessViewSet(viewsets.ModelViewSet):
@@ -58,32 +65,34 @@ class StationViewSet(viewsets.ModelViewSet):
 class StationProductProcessView(APIView):
 
     def get(self, request):
-        data = Process.objects.select_related('product', 'station').filter(exit_time__isnull=True).values(
-            'station__name',
-            'product__product_id',
-            'product__product_name',
-            'entry_time',
-            'exit_time'
-        ).order_by('station_id')
+        data = (
+            Process.objects.select_related("product", "station")
+            .filter(exit_time__isnull=True)
+            .values(
+                "station__name",
+                "product__product_id",
+                "product__product_name",
+                "entry_time",
+                "exit_time",
+            )
+            .order_by("station_id")
+        )
 
         # Grouping the data by station
         grouped_data = defaultdict(list)
         for item in data:
-            station_name = item['station__name']
+            station_name = item["station__name"]
             product_info = {
-                'product_id': item['product__product_id'],
-                'product_name': item['product__product_name'],
-                'entry_time': item['entry_time'],
-                'exit_time': item['exit_time']
+                "product_id": item["product__product_id"],
+                "product_name": item["product__product_name"],
+                "entry_time": item["entry_time"],
+                "exit_time": item["exit_time"],
             }
             grouped_data[station_name].append(product_info)
 
         # Prepare the data for serialization
         response_data = [
-            {
-                'station_name': station,
-                'products': products
-            }
+            {"station_name": station, "products": products}
             for station, products in grouped_data.items()
         ]
 
@@ -95,19 +104,20 @@ class CastingSnapshotViewSet(viewsets.ModelViewSet):
     """
     API endpoint for managing Casting Snapshots.
     """
-    queryset = CastingSnapshot.objects.select_related(
-        'product',
-        'station',
-        'station_one',
-        'ramming_floor',
-        'molding_floor',
-        'pour',
-        'shakeout',
-        'quality',
 
+    queryset = CastingSnapshot.objects.select_related(
+        "product",
+        "station",
+        "station_one",
+        "ramming_floor",
+        "molding_floor",
+        "pour",
+        "shakeout",
+        "quality",
     )
     serializer_class = CastingSnapshotSerializer
     permission_classes = [permissions.IsAuthenticated]
+
 
 #     def create(self, request, *args, **kwargs):
 #         """

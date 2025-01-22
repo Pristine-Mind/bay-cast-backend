@@ -19,13 +19,7 @@ from .filterset import UserFilter
 
 
 def bad_request(message):
-    return JsonResponse(
-        {
-            "statusCode": 400,
-            "error_message": message
-        },
-        status=400
-    )
+    return JsonResponse({"statusCode": 400, "error_message": message}, status=400)
 
 
 class RegistrationView(views.APIView):
@@ -34,9 +28,7 @@ class RegistrationView(views.APIView):
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return response.Response(
-            serializer.data, status=status.HTTP_200_OK
-        )
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class LoginView(views.APIView):

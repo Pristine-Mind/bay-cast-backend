@@ -11,10 +11,10 @@ from product.models import (
 class ProcessAdminInline(admin.TabularInline):
     model = Process
     fields = (
-        'id',
-        'product',
-        'entry_time',
-        'exit_time',
+        "id",
+        "product",
+        "entry_time",
+        "exit_time",
     )
 
 

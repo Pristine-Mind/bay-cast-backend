@@ -7,32 +7,107 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0001_initial'),
+        ("product", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProcessingImages',
+            name="ProcessingImages",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('picture', models.ImageField(blank=True, null=True, upload_to='process_pictures/')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "picture",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="process_pictures/"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Process',
+            name="Process",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('process_number', models.IntegerField(default=1)),
-                ('stage', models.CharField(choices=[('engineering', 'Engineering'), ('pattern_shop', 'Pattern Shop'), ('ramming_floor', 'Ramming Floor'), ('molding_floor', 'Molding Floor'), ('closing', 'Closing'), ('pouring', 'Pouring'), ('shakeout', 'Shakeout'), ('cleaning', 'Cleaning')], max_length=20)),
-                ('entry_time', models.DateTimeField(verbose_name='Time of product entry in process')),
-                ('exit_time', models.DateTimeField(verbose_name='Time of product exit from process')),
-                ('temperature', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('humidity', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('baume', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('pouring_temperature', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('weights', models.FloatField(blank=True, null=True)),
-                ('pictures', models.ManyToManyField(blank=True, to='product.processingimages')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='product.product')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("process_number", models.IntegerField(default=1)),
+                (
+                    "stage",
+                    models.CharField(
+                        choices=[
+                            ("engineering", "Engineering"),
+                            ("pattern_shop", "Pattern Shop"),
+                            ("ramming_floor", "Ramming Floor"),
+                            ("molding_floor", "Molding Floor"),
+                            ("closing", "Closing"),
+                            ("pouring", "Pouring"),
+                            ("shakeout", "Shakeout"),
+                            ("cleaning", "Cleaning"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "entry_time",
+                    models.DateTimeField(
+                        verbose_name="Time of product entry in process"
+                    ),
+                ),
+                (
+                    "exit_time",
+                    models.DateTimeField(
+                        verbose_name="Time of product exit from process"
+                    ),
+                ),
+                (
+                    "temperature",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=5, null=True
+                    ),
+                ),
+                (
+                    "humidity",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=5, null=True
+                    ),
+                ),
+                (
+                    "baume",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=5, null=True
+                    ),
+                ),
+                (
+                    "pouring_temperature",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=5, null=True
+                    ),
+                ),
+                ("weights", models.FloatField(blank=True, null=True)),
+                (
+                    "pictures",
+                    models.ManyToManyField(blank=True, to="product.processingimages"),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="product.product",
+                    ),
+                ),
             ],
         ),
     ]

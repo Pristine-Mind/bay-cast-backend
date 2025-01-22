@@ -49,17 +49,13 @@ class ProductSerializer(serializers.ModelSerializer):
             Product: The newly created product instance.
         """
 
-        product_id = validated_data.get('product_id')
-        product_name = validated_data.get('product_name')
-        validated_data['qr_image'] = generate_qr(product_id, product_name)
+        product_id = validated_data.get("product_id")
+        product_name = validated_data.get("product_name")
+        validated_data["qr_image"] = generate_qr(product_id, product_name)
         product = super().create(validated_data)
 
         # create corresponding process as well
-        Process.objects.create(
-            product=product,
-            station_id=1,
-            entry_time=timezone.now()
-        )
+        Process.objects.create(product=product, station_id=1, entry_time=timezone.now())
         return product
 
 
@@ -85,15 +81,15 @@ class StationSerialzier(serializers.ModelSerializer):
 
     class Meta:
         model = Station
-        fields = '__all__'
+        fields = "__all__"
 
     def get_number_of_products(self, obj):
-        return Product.objects.filter(
-            process__station=obj
-        ).count()
+        return Product.objects.filter(process__station=obj).count()
 
     def get_products(self, obj):
-        queryset = Process.objects.filter(station=obj, is_active=True).select_related('product')
+        queryset = Process.objects.filter(station=obj, is_active=True).select_related(
+            "product"
+        )
 
         return [
             {
@@ -101,8 +97,11 @@ class StationSerialzier(serializers.ModelSerializer):
                 "product_name": process.product.product_name,
                 "entry_time": process.entry_time,
                 "exit_time": process.exit_time,
-                "qr_image": self.context.get('request').build_absolute_uri(process.product.qr_image.url),
-            } for process in queryset
+                "qr_image": self.context.get("request").build_absolute_uri(
+                    process.product.qr_image.url
+                ),
+            }
+            for process in queryset
         ]
 
 
@@ -121,43 +120,44 @@ class StationProductProcessSerializer(serializers.Serializer):
 class MoldingFloorSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoldingFloor
-        fields = '__all__'
+        fields = "__all__"
 
 
 class StationOneSerializer(serializers.ModelSerializer):
     class Meta:
         model = StationOne
-        fields = '__all__'
+        fields = "__all__"
 
 
 class PourSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pour
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ShakeoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shakeout
-        fields = '__all__'
+        fields = "__all__"
 
 
 class QualitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Quality
-        fields = '__all__'
+        fields = "__all__"
 
 
 class RammingFloorSerializer(serializers.ModelSerializer):
     class Meta:
         model = RammingFloor
-        fields = '__all__'
+        fields = "__all__"
 
 
 class CastingSnapshotSerializer(serializers.ModelSerializer):
     """
     Serializer for the CastingSnapshot model, with nested station-specific serializers.
     """
+
     station_one = StationOneSerializer(required=False, allow_null=True)
     ramming_floor = RammingFloorSerializer(required=False, allow_null=True)
     molding_floor = MoldingFloorSerializer(required=False, allow_null=True)
@@ -168,15 +168,15 @@ class CastingSnapshotSerializer(serializers.ModelSerializer):
     class Meta:
         model = CastingSnapshot
         fields = [
-            'id',
-            'product',
-            'station',
-            'station_one',
-            'ramming_floor',
-            'molding_floor',
-            'pour',
-            'shakeout',
-            'quality',
+            "id",
+            "product",
+            "station",
+            "station_one",
+            "ramming_floor",
+            "molding_floor",
+            "pour",
+            "shakeout",
+            "quality",
         ]
 
     def has_significant_value(self, data):
@@ -189,17 +189,11 @@ class CastingSnapshotSerializer(serializers.ModelSerializer):
             return False
 
         for value in data.values():
-            # 1. If value is None, ignore
             if value is None:
                 continue
 
-            # 2. If it's a string, see if it's empty or just whitespace
-            if isinstance(value, str) and value.strip() == '':
+            if isinstance(value, str) and value.strip() == "":
                 continue
-
-            # 3. If you also consider zero to be "insignificant," check that here:
-            # if isinstance(value, (int, float)) and value == 0:
-            #    continue
 
             return True
 
@@ -209,12 +203,12 @@ class CastingSnapshotSerializer(serializers.ModelSerializer):
         """
         Custom create method to handle nested writes for station-specific data.
         """
-        station_one_data = validated_data.pop('station_one', None)
-        molding_floor_data = validated_data.pop('molding_floor', None)
-        pour_data = validated_data.pop('pour', None)
-        shakeout_data = validated_data.pop('shakeout', None)
-        quality_data = validated_data.pop('quality', None)
-        ramming_floor_data = validated_data.pop('ramming_floor', None)
+        station_one_data = validated_data.pop("station_one", None)
+        molding_floor_data = validated_data.pop("molding_floor", None)
+        pour_data = validated_data.pop("pour", None)
+        shakeout_data = validated_data.pop("shakeout", None)
+        quality_data = validated_data.pop("quality", None)
+        ramming_floor_data = validated_data.pop("ramming_floor", None)
 
         # Create the CastingSnapshot first
         snapshot = CastingSnapshot.objects.create(**validated_data)
@@ -260,12 +254,12 @@ class CastingSnapshotSerializer(serializers.ModelSerializer):
         """
         Custom update method for nested writes.
         """
-        station_one_data = validated_data.pop('station_one', None)
-        molding_floor_data = validated_data.pop('molding_floor', None)
-        pour_data = validated_data.pop('pour', None)
-        shakeout_data = validated_data.pop('shakeout', None)
-        quality_data = validated_data.pop('quality', None)
-        ramming_floor_data = validated_data.pop('ramming_floor', None)
+        station_one_data = validated_data.pop("station_one", None)
+        molding_floor_data = validated_data.pop("molding_floor", None)
+        pour_data = validated_data.pop("pour", None)
+        shakeout_data = validated_data.pop("shakeout", None)
+        quality_data = validated_data.pop("quality", None)
+        ramming_floor_data = validated_data.pop("ramming_floor", None)
 
         # Update the CastingSnapshot's own fields
         for attr, value in validated_data.items():
@@ -294,7 +288,7 @@ class CastingSnapshotSerializer(serializers.ModelSerializer):
                 molding_floor_obj = MoldingFloor.objects.create(**molding_floor_data)
                 instance.molding_floor = molding_floor_obj
                 instance.save()
-        
+
         # Update or create MoldingFloor
         if ramming_floor_data is not None:
             if instance.ramming_floor:

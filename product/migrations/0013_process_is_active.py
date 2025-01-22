@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0012_alter_quality_comments'),
+        ("product", "0012_alter_quality_comments"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='process',
-            name='is_active',
+            model_name="process",
+            name="is_active",
             field=models.BooleanField(default=True),
         ),
     ]

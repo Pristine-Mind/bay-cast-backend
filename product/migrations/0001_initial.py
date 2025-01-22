@@ -7,16 +7,21 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('product_id', models.CharField(max_length=50, primary_key=True, serialize=False)),
-                ('product_name', models.CharField(max_length=100)),
-                ('qr_image', models.ImageField(blank=True, null=True, upload_to='qr_codes/')),
+                (
+                    "product_id",
+                    models.CharField(max_length=50, primary_key=True, serialize=False),
+                ),
+                ("product_name", models.CharField(max_length=100)),
+                (
+                    "qr_image",
+                    models.ImageField(blank=True, null=True, upload_to="qr_codes/"),
+                ),
             ],
         ),
     ]

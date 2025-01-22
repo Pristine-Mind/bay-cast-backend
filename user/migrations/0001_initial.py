@@ -10,15 +10,33 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Profile',
+            name="Profile",
             fields=[
-                ('user', models.OneToOneField(editable=False, on_delete=django.db.models.deletion.CASCADE, primary_key=True, related_name='profile', serialize=False, to=settings.AUTH_USER_MODEL, verbose_name='user')),
-                ('user_type', models.CharField(choices=[('admin', 'Admin'), ('operator', 'Operator')], max_length=255, verbose_name='Type of user')),
+                (
+                    "user",
+                    models.OneToOneField(
+                        editable=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        related_name="profile",
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="user",
+                    ),
+                ),
+                (
+                    "user_type",
+                    models.CharField(
+                        choices=[("admin", "Admin"), ("operator", "Operator")],
+                        max_length=255,
+                        verbose_name="Type of user",
+                    ),
+                ),
             ],
         ),
     ]

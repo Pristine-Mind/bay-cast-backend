@@ -15,17 +15,23 @@ class RegistrationTest(APITestCase):
             "password": "haA1ScKwEuEs3aX",
             "first_name": "Peter",
             "last_name": "Falk",
-            "user_type": Profile.UserType.ADMIN
+            "user_type": Profile.UserType.ADMIN,
         }
         resp = self.client.post("/register", json=data)
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(User.objects.filter(is_active=False).count(), old_user_count)  # No new user to be created
+        self.assertEqual(
+            User.objects.filter(is_active=False).count(), old_user_count
+        )  # No new user to be created
 
         # update the email now should create user
         data["email"] = "test@gmail.com"
         resp = self.client.post("/register", data=data)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(User.objects.filter(is_active=True).count(), old_user_count + 1)
+        self.assertEqual(
+            User.objects.filter(is_active=True).count(), old_user_count + 1
+        )
 
         # check profile is created for the user
-        self.assertEqual(Profile.objects.filter(user__email=data["email"]).exists(), True)
+        self.assertEqual(
+            Profile.objects.filter(user__email=data["email"]).exists(), True
+        )

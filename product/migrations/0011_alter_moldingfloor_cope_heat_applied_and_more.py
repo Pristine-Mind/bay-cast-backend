@@ -6,28 +6,43 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0010_alter_castingsnapshot_molding_floor_and_more'),
+        ("product", "0010_alter_castingsnapshot_molding_floor_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='moldingfloor',
-            name='cope_heat_applied',
-            field=models.BooleanField(blank=True, help_text='Indicates if heat was applied for cope.', null=True, verbose_name='Cope Heat Applied'),
+            model_name="moldingfloor",
+            name="cope_heat_applied",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if heat was applied for cope.",
+                null=True,
+                verbose_name="Cope Heat Applied",
+            ),
         ),
         migrations.AlterField(
-            model_name='moldingfloor',
-            name='core_heat_applied',
-            field=models.BooleanField(blank=True, help_text='Indicates if heat was applied for core.', null=True, verbose_name='Core Heat Applied'),
+            model_name="moldingfloor",
+            name="core_heat_applied",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if heat was applied for core.",
+                null=True,
+                verbose_name="Core Heat Applied",
+            ),
         ),
         migrations.AlterField(
-            model_name='moldingfloor',
-            name='drag_heat_applied',
-            field=models.BooleanField(blank=True, help_text='Indicates if heat was applied for drag.', null=True, verbose_name='Drag Heat Applied'),
+            model_name="moldingfloor",
+            name="drag_heat_applied",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Indicates if heat was applied for drag.",
+                null=True,
+                verbose_name="Drag Heat Applied",
+            ),
         ),
         migrations.AlterField(
-            model_name='quality',
-            name='comments',
+            model_name="quality",
+            name="comments",
             field=models.CharField(blank=True, null=True),
         ),
     ]

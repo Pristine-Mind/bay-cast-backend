@@ -6,17 +6,17 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0007_remove_castingsnapshot_sand_temperature_and_more'),
+        ("product", "0007_remove_castingsnapshot_sand_temperature_and_more"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='CastingSnapshot',
+            name="CastingSnapshot",
         ),
         migrations.DeleteModel(
-            name='MoldingFloor',
+            name="MoldingFloor",
         ),
         migrations.DeleteModel(
-            name='RammingFloor',
+            name="RammingFloor",
         ),
     ]

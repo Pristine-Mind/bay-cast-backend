@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0011_alter_moldingfloor_cope_heat_applied_and_more'),
+        ("product", "0011_alter_moldingfloor_cope_heat_applied_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='quality',
-            name='comments',
+            model_name="quality",
+            name="comments",
             field=models.TextField(blank=True, null=True),
         ),
     ]

@@ -218,19 +218,22 @@ class MoldingFloor(models.Model):
     )
 
     cope_heat_applied = models.BooleanField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name="Cope Heat Applied",
         help_text="Indicates if heat was applied for cope.",
     )
 
     drag_heat_applied = models.BooleanField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name="Drag Heat Applied",
         help_text="Indicates if heat was applied for drag.",
     )
 
     core_heat_applied = models.BooleanField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name="Core Heat Applied",
         help_text="Indicates if heat was applied for core.",
     )

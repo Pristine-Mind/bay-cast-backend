@@ -7,8 +7,9 @@ from user.models import Profile
 class UserFilter(filters.FilterSet):
     username = filters.CharFilter(field_name="username", lookup_expr="icontains")
     role = filters.MultipleChoiceFilter(
-        choices=Profile.UserType.choices, widget=filters.widgets.CSVWidget,
-        field_name="profile__user_type"
+        choices=Profile.UserType.choices,
+        widget=filters.widgets.CSVWidget,
+        field_name="profile__user_type",
     )
 
     class Meta:

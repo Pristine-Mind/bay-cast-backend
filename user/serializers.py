@@ -19,7 +19,7 @@ class RegistrationSerializer(serializers.Serializer):
     def validate_username(self, username):
         if User.objects.filter(username__iexact=username).exists():
             raise serializers.ValidationError(
-                'A user with that username already exists.'
+                "A user with that username already exists."
             )
         return username
 
@@ -28,14 +28,14 @@ class RegistrationSerializer(serializers.Serializer):
         return password
 
     def save(self):
-        username = self.validated_data['username']
-        first_name = self.validated_data['first_name']
-        last_name = self.validated_data['last_name']
-        email = self.validated_data['email']
-        password = self.validated_data['password']
+        username = self.validated_data["username"]
+        first_name = self.validated_data["first_name"]
+        last_name = self.validated_data["last_name"]
+        email = self.validated_data["email"]
+        password = self.validated_data["password"]
 
         # profile
-        user_type = self.validated_data['user_type']
+        user_type = self.validated_data["user_type"]
 
         # Create the User object
         try:
@@ -45,10 +45,10 @@ class RegistrationSerializer(serializers.Serializer):
                 last_name=last_name,
                 email=email,
                 password=password,
-                is_active=True
+                is_active=True,
             )
         except Exception:
-            raise serializers.ValidationError('Could not create user.')
+            raise serializers.ValidationError("Could not create user.")
         try:
             Profile.objects.get_or_create(user=user, user_type=user_type)
         except Exception:
@@ -61,19 +61,15 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(
-        source='profile.get_user_type_display',
-        read_only=True
-    )
+    role = serializers.CharField(source="profile.get_user_type_display", read_only=True)
 
     class Meta:
         model = User
         fields = (
-            'id',
-            'username',
-            'role',
-            'first_name',
-            'last_name',
-            'email',
+            "id",
+            "username",
+            "role",
+            "first_name",
+            "last_name",
+            "email",
         )
-

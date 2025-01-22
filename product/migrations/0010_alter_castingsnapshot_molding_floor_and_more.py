@@ -7,23 +7,44 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('product', '0009_moldingfloor_pour_quality_rammingfloor_shakeout_and_more'),
+        ("product", "0009_moldingfloor_pour_quality_rammingfloor_shakeout_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='castingsnapshot',
-            name='molding_floor',
-            field=models.OneToOneField(blank=True, help_text='Molding floor details for cope, drag, and core.', null=True, on_delete=django.db.models.deletion.CASCADE, to='product.moldingfloor', verbose_name='Molding Floor'),
+            model_name="castingsnapshot",
+            name="molding_floor",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="Molding floor details for cope, drag, and core.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="product.moldingfloor",
+                verbose_name="Molding Floor",
+            ),
         ),
         migrations.AlterField(
-            model_name='castingsnapshot',
-            name='ramming_floor',
-            field=models.OneToOneField(blank=True, help_text='Ramming floor details for cope, drag, and core.', null=True, on_delete=django.db.models.deletion.CASCADE, to='product.rammingfloor', verbose_name='Ramming Floor'),
+            model_name="castingsnapshot",
+            name="ramming_floor",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="Ramming floor details for cope, drag, and core.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="product.rammingfloor",
+                verbose_name="Ramming Floor",
+            ),
         ),
         migrations.AlterField(
-            model_name='castingsnapshot',
-            name='station_one',
-            field=models.OneToOneField(blank=True, help_text='Station One.', null=True, on_delete=django.db.models.deletion.CASCADE, to='product.stationone', verbose_name='StationOne'),
+            model_name="castingsnapshot",
+            name="station_one",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="Station One.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="product.stationone",
+                verbose_name="StationOne",
+            ),
         ),
     ]
